@@ -364,6 +364,17 @@ public class TaskRestController {
 
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)
     JsonResult invoke(@RequestBody JSONObject lists, HttpServletRequest request) {
+
+        //从参与式平台过来会带着其他参数，这里用正则判断，并处理
+        String[] oidFromGeoProblemSolving;
+        if(lists.getString("oid").indexOf("?")>-1){
+            //如果是参与式过来的，处理oid
+            oidFromGeoProblemSolving=lists.getString("oid").split("\\?");
+            lists.replace("oid",lists.getString("oid"),oidFromGeoProblemSolving[0]);
+
+
+        }
+
         ComputableModel computableModel=computableModelService.getByOid(lists.getString("oid"));
         HttpSession session = request.getSession();
         String mdlStr=computableModel.getMdl();
@@ -579,6 +590,17 @@ public class TaskRestController {
     public JsonResult loadDataItemData(@RequestBody TestDataUploadDTO testDataUploadDTO,HttpServletRequest request) throws Exception {
         JsonResult jsonResult = new JsonResult();
         String oid = testDataUploadDTO.getOid();
+
+
+        //从参与式平台过来会带着其他参数，这里用正则判断，并处理
+        String[] oidFromGeoProblemSolving;
+        if(oid.indexOf("?")>-1){
+            //如果是参与式过来的，处理oid
+            oidFromGeoProblemSolving=oid.split("\\?");
+            oid=oidFromGeoProblemSolving[0];
+            testDataUploadDTO.setOid(oidFromGeoProblemSolving[0]);
+        }
+
         ComputableModel computableModel= computableModelDao.findFirstByOid(oid);
         JSONObject mdlJSON = Utils.convertMdl(computableModel.getMdl());
 

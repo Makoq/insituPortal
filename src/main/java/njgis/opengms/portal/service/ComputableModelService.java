@@ -417,8 +417,6 @@ public class ComputableModelService {
 
     public JSONObject getRelatedDataByPage(ComputableModelFindDTO computableModelFindDTO,String oid){
         //从参与式平台过来会带着其他参数，这里用正则判断，并处理
-
-
         String[] oidFromGeoProblemSolving;
         if(oid.indexOf("?")>-1){
             //如果是参与式过来的，处理oid

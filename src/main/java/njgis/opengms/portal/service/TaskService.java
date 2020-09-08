@@ -910,7 +910,6 @@ public class TaskService {
             resultDataDTOList.add(resultDataDTO);
         }
         for (int i = 0; i < task.getOutputs().size(); i++) {
-
             ResultDataDTO resultDataDTO = new ResultDataDTO();
             resultDataDTO.setUrl(task.getOutputs().get(i).getUrl());
             if(task.getOutputs().get(i).getUrl().contains("["))
