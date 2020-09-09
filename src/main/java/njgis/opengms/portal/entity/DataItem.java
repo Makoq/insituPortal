@@ -35,9 +35,10 @@ public class DataItem extends Item{
 
     List<String> classifications;
     List<String> displays;
+    String image;
     List<String> relatedModels;
     List<DataMeta> dataList;
-    List<FileMetaUser> userDataList;
+    List<FileMetaUser> userDataList;//待删
 //    List<String> contributers;
 
     DataItemMeta meta;
@@ -46,7 +47,7 @@ public class DataItem extends Item{
 
     //Share in place
     String distributedNodeDataId;
-//    String size;
+    //    String size;
     String type;
     Boolean authority;
     String workSpace;
@@ -54,6 +55,7 @@ public class DataItem extends Item{
     String dataPath;
     String date;
     String dataUrl;
+    String ip;
 
     List<RelatedProcessing> relatedProcessings;
     List<RelatedVisualization> relatedVisualizations;

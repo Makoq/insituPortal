@@ -15,28 +15,19 @@ import java.util.List;
  */
 @Document
 @Data
-public class DataItemVersion {
-    @Id
-    String id;
-    String originOid;//正式数据库对应条目的oid
-    String oid;
-    String name;//
-    String image;//
-    String description;//
-    String detail;//
+public class DataItemVersion extends DataItem{
+    String originId;//正式数据库对应条目的oid
     String modifier;
     String creator;
     int readStatus;
+    int verStatus;
 
     Long verNumber;//版本号
-    int status;//版本状态
 
-    List<String> classifications;//
-    List<String> keywords;//
     List<Reference> references;//
-    List<AuthorInfo> authorship;//
 
     Date modifyTime;
     Date acceptTime;
     Date rejectTime;
 }
+

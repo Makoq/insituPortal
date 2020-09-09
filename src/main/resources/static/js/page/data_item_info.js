@@ -301,26 +301,26 @@ var  data_item_info= new Vue({
                 // inputErrorMessage: '邮箱格式不正确'
             }).then(({ value }) => {
 
-                    $.ajax({
-                        type: "POST",
-                        url: "/user/addFolder",
-                        data: {paths: paths, name: value},
-                        async: true,
-                        contentType: "application/x-www-form-urlencoded",
-                        success: (json) => {
-                            if (json.code == -1) {
-                                this.confirmLogin();
-                            }
-                            else {
-                                const newChild = {id: json.data, label: value, children: []};
-                                if (!data.children) {
-                                    this.$set(data, 'children', []);
-                                }
-                                data.children.push(newChild);
-                            }
-
+                $.ajax({
+                    type: "POST",
+                    url: "/user/addFolder",
+                    data: {paths: paths, name: value},
+                    async: true,
+                    contentType: "application/x-www-form-urlencoded",
+                    success: (json) => {
+                        if (json.code == -1) {
+                            this.confirmLogin();
                         }
-                    });
+                        else {
+                            const newChild = {id: json.data, label: value, children: []};
+                            if (!data.children) {
+                                this.$set(data, 'children', []);
+                            }
+                            data.children.push(newChild);
+                        }
+
+                    }
+                });
 
 
             }).catch(() => {
@@ -565,8 +565,8 @@ var  data_item_info= new Vue({
             };
             let url,contentType;
 
-                    url="/modelItem/listByAuthor";
-                    contentType="application/x-www-form-urlencoded";
+            url="/modelItem/listByAuthor";
+            contentType="application/x-www-form-urlencoded";
 
             $.ajax({
                 type: "POST",
@@ -600,9 +600,9 @@ var  data_item_info= new Vue({
         handleShare(index,row){
 
         },
-         getImg(item){
+        getImg(item){
             return "/static/img/filebrowser/"+item.suffix+".svg"
-         },
+        },
         generateId(key){
             return key;
         },
@@ -615,9 +615,9 @@ var  data_item_info= new Vue({
 
             if(currentData!=''){
                 let url ="/dispatchRequest/download?url=" + currentData;
-                 this.$alert("<input style='width: 100%' value="+'https://geomodeling.njnu.edu.cn'+url+">",{
-                     dangerouslyUseHTMLString: true
-                 })
+                this.$alert("<input style='width: 100%' value="+'https://geomodeling.njnu.edu.cn'+url+">",{
+                    dangerouslyUseHTMLString: true
+                })
                 // this.dataid='';
 
             }else {
@@ -641,13 +641,13 @@ var  data_item_info= new Vue({
             }
 
 
-             let link =document.createElement("a");
-             link.style.display='none';
-             link.href=downloadAllZipUrl;
-             link.setAttribute("download","allData.zip");
+            let link =document.createElement("a");
+            link.style.display='none';
+            link.href=downloadAllZipUrl;
+            link.setAttribute("download","allData.zip");
 
-             document.body.appendChild(link);
-             link.click();
+            document.body.appendChild(link);
+            link.click();
 
         },
         showtitle(ev){
@@ -934,7 +934,7 @@ var  data_item_info= new Vue({
         },
         //格式化评论时间
         formatDate(date){
-                var dateee=new Date(date).toJSON();
+            var dateee=new Date(date).toJSON();
             var da = new Date(+new Date(dateee)+8*3600*1000).toISOString().replace(/T/g,' ').replace(/\.[\d]{3}Z/,'')
             return da
         },
@@ -1023,26 +1023,26 @@ var  data_item_info= new Vue({
         loadAddMore(e){
 
             let that=this
-                if ( e.target.scrollHeight - e.target.clientHeight-e.target.scrollTop <10) { //到达底部100px时,加载新内容
+            if ( e.target.scrollHeight - e.target.clientHeight-e.target.scrollTop <10) { //到达底部100px时,加载新内容
 
-                    clearTimeout(this.timer);
+                clearTimeout(this.timer);
 
-                    this.timer=setTimeout(()=>{
-                            that.searchAddModelPage+=1// 这里加载数据..
-
-
-
-                            if(this.value1==='1'){
-                                that.addSearchFromUser()
-                            }else if(this.value1==='2'){
-                                that.addSearchFromAll()
-                            }
+                this.timer=setTimeout(()=>{
+                        that.searchAddModelPage+=1// 这里加载数据..
 
 
-                        },
-                        500)
 
-                }
+                        if(this.value1==='1'){
+                            that.addSearchFromUser()
+                        }else if(this.value1==='2'){
+                            that.addSearchFromAll()
+                        }
+
+
+                    },
+                    500)
+
+            }
 
 
         },
@@ -1059,16 +1059,16 @@ var  data_item_info= new Vue({
             axios.get("/modelItem/searchModelItemsByUserId",{
                 params:data
             })
-            .then((res)=>{
+                .then((res)=>{
 
-                if(res.status===200){
-                    that.loading=false
-                    that.searchAddRelatedModels=that.searchAddRelatedModels.concat(res.data.data.modelItems)
-                }
+                    if(res.status===200){
+                        that.loading=false
+                        that.searchAddRelatedModels=that.searchAddRelatedModels.concat(res.data.data.modelItems)
+                    }
 
 
 
-            })
+                })
 
         },
         addSearchFromAll(){
@@ -1267,6 +1267,7 @@ var  data_item_info= new Vue({
             };
             // console.log('sd');
             // var time = new Date();
+            let that=this
             $.ajax({
                 url:"/dataItem/getDistributedObj",
                 type:"GET",
@@ -1274,13 +1275,13 @@ var  data_item_info= new Vue({
                 async:false,
                 success:(json)=>{
                     if (json.code == "0") {
-                        this.objDistributed = json.data;
-                        this.linkWebsocket("distributed");
+                        that.objDistributed = json.data;
+                        that.linkWebsocket("distributed");
                     }else if(json.code==-1){
                         alert("Please login first!");
                         window.location.href="/user/login";
                     }else if (json.code = "1"){
-                        this.loading = false;
+                        that.loading = false;
                         // $(".connect").hide();
                         let dataUrl = json.data;
                         window.location.href=dataUrl;
@@ -1771,60 +1772,81 @@ var dataSelection=[];
 //JQuery
 $(function () {
 
-        //数据项点击样式事件
-        $(".filecontent .el-card").on('click',function (e) {
-            console.log(e.currentTarget.id)
-            let exist=false;
-            for(i=0;i<dataSelection.length;i++)
-            {
-                let data=dataSelection[i];
-                if(data==e.currentTarget.id){
-                    exist=true;
-                    dataSelection.splice(i,1);
-                    $(this).removeClass("clickdataitem");
-                    break;
-                }
+    //数据项点击样式事件
+    $(".filecontent .el-card").on('click',function (e) {
+        console.log(e.currentTarget.id)
+        let exist=false;
+        for(i=0;i<dataSelection.length;i++)
+        {
+            let data=dataSelection[i];
+            if(data==e.currentTarget.id){
+                exist=true;
+                dataSelection.splice(i,1);
+                $(this).removeClass("clickdataitem");
+                break;
             }
+        }
 
-            if(!exist){
-                dataSelection.push(e.currentTarget.id);
-                $(this).addClass("clickdataitem");
-            }
+        if(!exist){
+            dataSelection.push(e.currentTarget.id);
+            $(this).addClass("clickdataitem");
+        }
 
-        });
-
-
-        //contents白板右键点击菜单事件，是否添加有待进一步思考
-        $(".filecontent").contextmenu(function (e) {
-            e.preventDefault();
-            // $(".browser").css({
-            //     "left":e.pageX,
-            //     "top":e.pageY
-            // }).show();
-
-        });
+    });
 
 
+    //contents白板右键点击菜单事件，是否添加有待进一步思考
+    $(".filecontent").contextmenu(function (e) {
+        e.preventDefault();
+        // $(".browser").css({
+        //     "left":e.pageX,
+        //     "top":e.pageY
+        // }).show();
 
-        //下载全部按钮为所有数据项添加样式事件
-        $(".downloadAll").click(function () {
-            $(".dataitemisol").addClass("clickdataitem")
+    });
 
-            let downloadAllZipUrl="/dataManager/downloadSomeRemote"
 
-            let data=$(".dataitemisol");
-            console.log($(".dataitemisol").get(1));
-            for(i=0;i<data.length;i++){
-                let url=data.eq(i).attr('id');
-                let id=getUrlParam(url);
+
+    //下载全部按钮为所有数据项添加样式事件
+    $(".downloadAll").click(function () {
+        $(".dataitemisol").addClass("clickdataitem")
+
+        let downloadAllZipUrl="/dataManager/downloadSomeRemote"
+
+        let data=$(".dataitemisol");
+        console.log($(".dataitemisol").get(1));
+        for(i=0;i<data.length;i++){
+            let url=data.eq(i).attr('id');
+            let id=getUrlParam(url);
+
+            downloadAllZipUrl+=i==0?'?':'&';
+            downloadAllZipUrl+=id;
+
+        }
+
+        // let downloadallzipurl="http://172.21.212.64:8082/dataResource/getResourcesRelatedDataItem/"+url[url.length-1];
+        //
+        let link =document.createElement("a");
+        link.style.display='none';
+        link.href=downloadAllZipUrl;
+        link.setAttribute("download","allData.zip");
+
+        document.body.appendChild(link);
+        link.click();
+
+    });
+
+    $(".dwload").click(function () {
+        let downloadAllZipUrl="/dataManager/downloadSomeRemote";
+        if(dataSelection.length!=0) {
+            for(i=0;i<dataSelection.length;i++){
+
+                let id=getUrlParam(dataSelection[i]);
 
                 downloadAllZipUrl+=i==0?'?':'&';
                 downloadAllZipUrl+=id;
 
             }
-
-            // let downloadallzipurl="http://172.21.212.64:8082/dataResource/getResourcesRelatedDataItem/"+url[url.length-1];
-            //
             let link =document.createElement("a");
             link.style.display='none';
             link.href=downloadAllZipUrl;
@@ -1832,70 +1854,49 @@ $(function () {
 
             document.body.appendChild(link);
             link.click();
+        }
+        else{
+            alert('please select file first!!');
+        }
 
-        });
 
-        $(".dwload").click(function () {
-            let downloadAllZipUrl="/dataManager/downloadSomeRemote";
-            if(dataSelection.length!=0) {
-                for(i=0;i<dataSelection.length;i++){
+    });
 
-                    let id=getUrlParam(dataSelection[i]);
 
-                    downloadAllZipUrl+=i==0?'?':'&';
-                    downloadAllZipUrl+=id;
+    //搜索结果样式效果和菜单事件
+    $("#browsercont").on('click',function (e) {
 
-                }
-                let link =document.createElement("a");
-                link.style.display='none';
-                link.href=downloadAllZipUrl;
-                link.setAttribute("download","allData.zip");
+        $(".el-card.dataitemisol.is-never-shadow.sresult").click(function () {
+            $(this).addClass("clickdataitem");
 
-                document.body.appendChild(link);
-                link.click();
-            }
-            else{
-                alert('please select file first!!');
-            }
-
+            $(this).siblings().removeClass("clickdataitem");
 
         });
 
 
-        //搜索结果样式效果和菜单事件
-        $("#browsercont").on('click',function (e) {
+        $(".el-card.dataitemisol.is-never-shadow.sresult").contextmenu(function () {
 
-            $(".el-card.dataitemisol.is-never-shadow.sresult").click(function () {
-                $(this).addClass("clickdataitem");
+            $(".browsermenu").css({
+                "left":e.pageX,
+                "top":e.pageY
+            }).show();
 
-                $(this).siblings().removeClass("clickdataitem");
-
-            });
-
-
-            $(".el-card.dataitemisol.is-never-shadow.sresult").contextmenu(function () {
-
-                $(".browsermenu").css({
-                    "left":e.pageX,
-                    "top":e.pageY
-                }).show();
-
-            })
+        })
 
 
-        });
+    });
 
-        //contents白板点击隐藏数据项菜单事件
-        $(".filecontent").click(function () {
-            $(".browsermenu").hide();
-            //$(".dataitemisol").removeClass("clickdataitem")
+    //contents白板点击隐藏数据项菜单事件
+    $(".filecontent").click(function () {
+        $(".browsermenu").hide();
+        //$(".dataitemisol").removeClass("clickdataitem")
 
-        });
+    });
 
-        //光标移入输入框隐藏数据项右键菜单
-        $("#searchinput").on("mouseenter",function () {
-            $(".browsermenu").hide();
-        });
+    //光标移入输入框隐藏数据项右键菜单
+    $("#searchinput").on("mouseenter",function () {
+        $(".browsermenu").hide();
+    });
 
 
     function getUrlParam(url,name) {
