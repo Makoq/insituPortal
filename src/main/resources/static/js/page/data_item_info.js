@@ -107,6 +107,7 @@ var  data_item_info= new Vue({
             parameters:[],
             loading: false,
             loading2:false,
+            loading3:false,
             processingType:"",
             dataItemId:"",
             objProcess:{
@@ -1365,8 +1366,8 @@ var  data_item_info= new Vue({
             })
         },
         invokeProcessingNow(){
-            this.loading = true;
-
+            //this.loading = true;
+            this.loading3 = true;
             this.objProcess.msg = 'reqPcs';//固定值，区分消息类型
             // var url = window.location.href;
             // var index = url.lastIndexOf("\/");
@@ -1419,6 +1420,7 @@ var  data_item_info= new Vue({
                 if (e.data === 'no data in service node!') {
                     if (type=="process"){
                         that.loading2 = false;
+                        that.loading3 = false;
                     }else {
                         that.loading = false;
                     }
@@ -1428,7 +1430,7 @@ var  data_item_info= new Vue({
                 //没有权限
                 if (e.data === 'no authority') {
                     if (type=="process"){
-                        that.loading2 = false;
+                        that.loading2 = false; that.loading3 = false;
                     }else {
                         that.loading = false;
                     }
@@ -1437,7 +1439,7 @@ var  data_item_info= new Vue({
                 //服务结点离线
                 if (e.data == 'node offline') {
                     if (type=="process"){
-                        that.loading2 = false;
+                        that.loading2 = false; that.loading3 = false;
                     }else {
                         that.loading = false;
                     }
@@ -1457,11 +1459,11 @@ var  data_item_info= new Vue({
                     if (r.msg == 'insitudata') {
                         // alert(e.data)
                         if (type=="process"){
-                            that.loading2 = false;
+                            that.loading2 = false; that.loading3 = false;
                         }else {
                             that.loading = false;
                         }
-                        that.loading = false;
+
                         window.location.href = "http://111.229.14.128:8899/data?uid="+ r.id;
 
                         return
@@ -1476,87 +1478,7 @@ var  data_item_info= new Vue({
 
 
         },
-        linkWebsocket(type){
-            let objSend;
-            if (type=="process"){
-                objSend = this.objProcess;
-            } else if (type == "distributed") {
-                objSend = this.objDistributed;
-            }
-            let that = this;
-            if(window.WebSocket) {
-                var ws = new WebSocket('ws://111.229.14.128:1708');
-                ws.onopen = function (e) {
-                    let obj = {
-                        msg: 'regist',
-                        token: that.dataItemId,
-                    }
-                    ws.send(JSON.stringify(obj));
-                }
-                ws.onclose = function (e) {
-                    console.log("服务器关闭");
-                }
-                ws.onerror = function () {
-                    console.log("连接出错");
-                }
 
-                ws.onmessage = function (e) {
-                    //没有对应数据
-                    if (e.data === 'no data in service node!') {
-                        if (type=="process"){
-                            that.loading2 = false;
-                        }else {
-                            that.loading = false;
-                        }
-                        // loading = false;
-                        alert('no data in service node!')
-                    } else
-                    //没有权限
-                    if (e.data === 'no authority') {
-                        if (type=="process"){
-                            that.loading2 = false;
-                        }else {
-                            that.loading = false;
-                        }
-                        alert('no authority')
-                    } else
-                    //服务结点离线
-                    if (e.data == 'node offline') {
-                        if (type=="process"){
-                            that.loading2 = false;
-                        }else {
-                            that.loading = false;
-                        }
-                        alert('service node offline')
-                    } else
-                    //注册门户到中转服务器成功
-                    if (e.data === 'success') {
-                        // alert("连接成功")
-                    } else {
-                        //心跳检测
-                        if (e.data === 'beat') {
-                            ws.send('online')
-
-                        } else {
-                        }
-                        let r = JSON.parse(e.data)
-                        if (r.msg == 'insitudata') {
-                            // alert(e.data)
-                            if (type=="process"){
-                                that.loading2 = false;
-                            }else {
-                                that.loading = false;
-                            }
-                            window.location.href = "http://111.229.14.128:8899/data?uid="+ r.id;
-                            return
-                        }
-                    }
-                    if (objSend!=null&&e.data!="node offline") {
-                        ws.send(JSON.stringify(objSend));
-                    }
-                }
-            }
-        },
     },
 
     mounted(){

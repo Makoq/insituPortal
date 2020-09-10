@@ -622,7 +622,7 @@
                         </div>
                         <div th:if="${#lists.size(relatedProcessing)}!=0">
                             <div class="list_panel" th:each="pro:${relatedProcessing}">
-                                <el-card  v-loading="loading">
+                                <el-card  v-loading="loading3">
                                     <a class="img">
                                         <img src="/static/img/insitu_assets/processing.gif">
                                     </a>
@@ -667,9 +667,9 @@
                         </div>
                         <div th:if="${#lists.size(relatedVisualization)}!=0">
                             <div class="list_panel" th:each="pro:${relatedVisualization}">
-                                <el-card v-loading="loading">
+                                <el-card v-loading="loading3">
                                     <a class="img">
-                                        <img src="/static/img/insitu_assets/visualization2.gif">
+                                        <img style="width: auto" src="/static/img/insitu_assets/visualization2.gif">
                                     </a>
                                     <div class="info" style="margin-top:0px;">
                                         <a th:text="${pro.proName}">Ground Water Flow System</a>
