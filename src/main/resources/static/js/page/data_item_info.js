@@ -1276,7 +1276,9 @@ var  data_item_info= new Vue({
                 success:(json)=>{
                     if (json.code == "0") {
                         that.objDistributed = json.data;
-                        that.linkWebsocket("distributed");
+                        // that.linkWebsocket("distributed");
+                        that.mseeageByWebSocket("distributed")
+
                     }else if(json.code==-1){
                         alert("Please login first!");
                         window.location.href="/user/login";
@@ -1363,16 +1365,8 @@ var  data_item_info= new Vue({
             })
         },
         invokeProcessingNow(){
-            this.loading2 = true;
-            // let obj = {
-            //     msg:"",
-            //     dataId:"",
-            //     pcsId:"",
-            //     params:[],
-            //     name:"",
-            //     token:"",
-            //     reqUsrOid:"",
-            // };
+            this.loading = true;
+
             this.objProcess.msg = 'reqPcs';//固定值，区分消息类型
             // var url = window.location.href;
             // var index = url.lastIndexOf("\/");
@@ -1401,11 +1395,86 @@ var  data_item_info= new Vue({
                     this.objProcess.token = json.token;
                     this.objProcess.reqUsrOid = json.userId;
                     this.objProcess.dataId = json.dataId;
-                    this.objProcess.wsId = this.dataItemId + "pcs";
+                    this.objProcess.wsId = this.dataItemId;
 
-                    this.linkWebsocket("process");
+                    this.mseeageByWebSocket("process");
                 }
             })
+        },
+        mseeageByWebSocket(type){
+
+
+            let objSend;
+            if (type=="process"){
+                objSend = this.objProcess;
+            } else if (type == "distributed") {
+                objSend = this.objDistributed;
+            }
+
+            let _ws=this.$root.$el._myws,that=this
+            _ws.send(JSON.stringify(objSend))
+            this.$root.$el._myws.onmessage=function (e) {
+
+                //没有对应数据
+                if (e.data === 'no data in service node!') {
+                    if (type=="process"){
+                        that.loading2 = false;
+                    }else {
+                        that.loading = false;
+                    }
+                    // loading = false;
+                    alert('no data in service node!')
+                } else
+                //没有权限
+                if (e.data === 'no authority') {
+                    if (type=="process"){
+                        that.loading2 = false;
+                    }else {
+                        that.loading = false;
+                    }
+                    alert('no authority')
+                } else
+                //服务结点离线
+                if (e.data == 'node offline') {
+                    if (type=="process"){
+                        that.loading2 = false;
+                    }else {
+                        that.loading = false;
+                    }
+                    alert('service node offline')
+                } else
+                //注册门户到中转服务器成功
+                if (e.data === 'success') {
+                    // alert("连接成功")
+                } else {
+                    //心跳检测
+                    if (e.data === 'beat') {
+                        _ws.send('online')
+
+                    } else {
+                    }
+                    let r = JSON.parse(e.data)
+                    if (r.msg == 'insitudata') {
+                        // alert(e.data)
+                        if (type=="process"){
+                            that.loading2 = false;
+                        }else {
+                            that.loading = false;
+                        }
+                        that.loading = false;
+                        window.location.href = "http://111.229.14.128:8899/data?uid="+ r.id;
+
+                        return
+                    }
+                }
+                // if (objSend!=null&&e.data!="node offline") {
+                //     _ws.send(JSON.stringify(objSend));
+                // }
+
+
+            }
+
+
         },
         linkWebsocket(type){
             let objSend;
@@ -1491,6 +1560,40 @@ var  data_item_info= new Vue({
     },
 
     mounted(){
+
+
+        // let that=_this
+
+        if(window.WebSocket) {
+            this.$root.$el._myws = new WebSocket('ws://111.229.14.128:1708');
+            this.$root.$el._myws.onopen = function (e) {
+                let obj = {
+                    msg: 'regist',
+                    token: that.dataItemId,
+                }
+                that.$root.$el._myws.send(JSON.stringify(obj));
+            }
+            this.$root.$el._myws.onclose = function (e) {
+                console.log("服务器关闭");
+            }
+            this.$root.$el._myws.onerror = function () {
+                console.log("连接出错");
+            }
+
+            this.$root.$el._myws.onmessage=function (e) {
+
+                if (e.data === 'success') {
+                    console.log("websocket set up")
+                }
+
+            }
+
+        }
+
+
+
+
+
         let that = this;
         //获取当前数据条目的id
         var url = window.location.href;

@@ -622,7 +622,7 @@
                         </div>
                         <div th:if="${#lists.size(relatedProcessing)}!=0">
                             <div class="list_panel" th:each="pro:${relatedProcessing}">
-                                <el-card>
+                                <el-card  v-loading="loading">
                                     <a class="img">
                                         <img src="/static/img/insitu_assets/processing.gif">
                                     </a>
@@ -667,7 +667,7 @@
                         </div>
                         <div th:if="${#lists.size(relatedVisualization)}!=0">
                             <div class="list_panel" th:each="pro:${relatedVisualization}">
-                                <el-card>
+                                <el-card v-loading="loading">
                                     <a class="img">
                                         <img src="/static/img/insitu_assets/visualization2.gif">
                                     </a>
