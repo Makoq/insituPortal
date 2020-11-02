@@ -622,7 +622,7 @@
                         </div>
                         <div th:if="${#lists.size(relatedProcessing)}!=0">
                             <div class="list_panel" th:each="pro:${relatedProcessing}">
-                                <el-card  v-loading="loading3">
+                                <el-card  v-loading="loading2">
                                     <a class="img">
                                         <img src="/static/img/insitu_assets/processing.gif">
                                     </a>
@@ -959,7 +959,10 @@
                         <input type="text" autocomplete="off" placeholder="Please enter the content" :id ="para" class="el-input__inner">
                     </div>
                 </div>
+
+
             </el-card>
+
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">Cancel</el-button>
                 <el-button type="primary" @click="invokeProcessingNow();dialogVisible = false">Invoke Now</el-button>

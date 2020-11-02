@@ -294,7 +294,7 @@ public class ModelItemService {
         if(dataItems!=null){
             for(String dataId:dataItems){
                 DataItem dataItem=dataItemDao.findFirstById(dataId);
-                if(dataItem.getStatus().equals("Private")){
+                if(dataItem.getAuthority()!=null&&dataItem.getAuthority().equals(false)||dataItem.getStatus()!=null&&dataItem.getStatus().equals("Private")){
                     continue;
                 }
                 JSONObject dataJson=new JSONObject();

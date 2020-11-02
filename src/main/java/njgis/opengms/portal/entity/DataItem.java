@@ -32,6 +32,8 @@ public class DataItem extends Item{
     String contentType;
     String userName;
     String reference;
+    String tabType;//标识四个tabs，包括hubs、repository、network与application
+
 
     List<String> classifications;
     List<String> displays;

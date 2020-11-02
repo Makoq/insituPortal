@@ -11,6 +11,7 @@ import njgis.opengms.portal.dto.DataCategorysAddDTO;
 import njgis.opengms.portal.dto.categorys.CategoryAddDTO;
 import njgis.opengms.portal.dto.dataItem.DataItemAddDTO;
 import njgis.opengms.portal.dto.dataItem.DataItemFindDTO;
+import njgis.opengms.portal.dto.dataItem.DataItemResultDTO;
 import njgis.opengms.portal.dto.dataItem.DataItemUpdateDTO;
 import njgis.opengms.portal.dto.theme.ThemeUpdateDTO;
 import njgis.opengms.portal.entity.*;
@@ -30,6 +31,9 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -106,6 +110,9 @@ public class DataItemRestController {
 
     @Autowired
     DataItemNewDao dataItemNewDao;
+
+    @Autowired
+    DataHubsDao dataHubsDao;
 
     @Value ("${dataContainerIpAndPort}")
     String dataContainerIpAndPort;
@@ -225,8 +232,42 @@ public class DataItemRestController {
         String loadUser = null;
         if(session.getAttribute("oid")!=null){
             loadUser =  session.getAttribute("oid").toString();}
-        return ResultUtils.success(dataItemService.findByCateg(categorysId,page,false,10,loadUser,dataType));
+//        return ResultUtils.success(dataItemService.findByCateg(categorysId,page,false,10,loadUser,dataType));
+        Pageable pageable = PageRequest.of(page-1, 10);
+        String tabType = "hub";
 
+        Page<DataItemResultDTO> dataItemResultDTOPageable;
+        if (dataType.equals("hubs")) {
+            tabType = "hub";
+            dataItemResultDTOPageable = dataHubsDao.findAllByClassificationsIn(categorysId, pageable);
+        }else if (dataType.equals("repository")){
+            tabType = "repository";
+            dataItemResultDTOPageable =
+                    dataItemDao.findAllByClassificationsAndDataTypeIn(categorysId, tabType, pageable);
+        }else {
+            dataType = "DistributedNode";
+            dataItemResultDTOPageable =
+                    dataItemNewDao.findAllByClassificationsAndDataTypeIn(categorysId, dataType, pageable);
+        }
+
+
+
+        JSONObject result = new JSONObject();
+        result.put("content", dataItemResultDTOPageable.getContent());
+        JSONArray users = new JSONArray();
+        for (int i=0;i<dataItemResultDTOPageable.getContent().size();i++){
+            JSONObject userJson = new JSONObject();
+            User user = userDao.findFirstByOid(dataItemResultDTOPageable.getContent().get(i).getAuthor());
+            userJson.put("name", user.getName());
+            userJson.put("oid", user.getOid());
+            String img = user.getImage();
+            userJson.put("image", img.equals("") ? "" : htmlLoadPath + user.getImage());
+            users.add(userJson);
+        }
+        result.put("users", users);
+        result.put("totalElements", dataItemResultDTOPageable.getTotalElements());
+
+        return ResultUtils.success(result);
     }
 
 
@@ -850,13 +891,16 @@ public class DataItemRestController {
     //第一次请求后将该数据下载url存储下来
     @RequestMapping(value = "/saveUrl",method = RequestMethod.POST)
     JsonResult saveUrl(@RequestParam(value = "dataOid") String  dataOid,
-                       @RequestParam(value = "dataUrl") String  dataUrl,
-                       HttpServletRequest request){
+                       @RequestParam(value = "rId") String  rId,
+                       @RequestParam(value = "type") String type){
         JsonResult jsonResult = new JsonResult();
+        if (!type.equals("distributed")){
+            return jsonResult;
+        }
         DataItemNew dataItemNew = dataItemNewDao.findFirstById(dataOid);
+        String dataUrl = "http://111.229.14.128:8899/data?uid="+ rId;
         dataItemNew.setDataUrl(dataUrl);
         dataItemNewDao.save(dataItemNew);
-
         return jsonResult;
     }
 
@@ -991,20 +1035,27 @@ public class DataItemRestController {
 
         //解析xml  利用Iterator获取xml的各种子节点
         Document document = DocumentHelper.parseText(xml);
-        Element employees = document.getRootElement();
-        int count = 0;
+        Element root = document.getRootElement();
+//        int count = 0;
         ArrayList<String> parameters = new ArrayList<>();
-        for (Iterator i = employees.elementIterator(); i.hasNext(); ) {
-            Element employee = (Element) i.next();
-            count++;
-            if (count != 3){
-                continue;
-            }
-            for (Iterator j = employee.elementIterator(); j.hasNext(); ) {
-                Element node = (Element) j.next();
-                parameters.add(node.attribute(0).getValue());
-            }
+        List<Element> pas =  root.element("Parameter").elements();
+        for (Element e : pas){
+            log.info(e.attributeValue("name"));
+            parameters.add(e.attributeValue("name"));
         }
+
+//        String paraName =  root.element("Parameter").element("Item").attributeValue("name");
+//        for (Iterator i = employees.elementIterator(); i.hasNext(); ) {
+//            Element employee = (Element) i.next();
+//            count++;
+//            if (count != 3){
+//                continue;
+//            }
+//            for (Iterator j = employee.elementIterator(); j.hasNext(); ) {
+//                Element node = (Element) j.next();
+//                parameters.add(node.attribute(0).getValue());
+//            }
+//        }
         jsonObject.put("parameters", parameters);
         jsonObject.put("code", 0);
         return jsonObject;

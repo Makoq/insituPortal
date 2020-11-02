@@ -405,15 +405,17 @@ public class DataItemService {
 
         //设置dataItem的图片path以及存储图片
         String path = "/repository/dataItem/" + UUID.randomUUID().toString() + ".jpg";
-        String[] strs = dataItemAddDTO.getUploadImage().split(",");
-        if(strs.length > 1){
-            String imgStr = dataItemAddDTO.getUploadImage().split(",")[1];
-            Utils.base64StrToImage(imgStr, resourcePath + path);
-            dataItem.setImage(path);
-        } else {
-            dataItem.setImage("");
-        }
 
+        if(dataItemAddDTO.getUploadImage()!=null) {
+            String[] strs = dataItemAddDTO.getUploadImage().split(",");
+            if (strs.length > 1) {
+                String imgStr = dataItemAddDTO.getUploadImage().split(",")[1];
+                Utils.base64StrToImage(imgStr, resourcePath + path);
+                dataItem.setImage(path);
+            } else {
+                dataItem.setImage("");
+            }
+        }
 //        dataItem.getComments().setCommentDate(now);
 
         dataItem.setLastModifyTime(now);
@@ -1513,6 +1515,9 @@ public class DataItemService {
         dataItemNew.setName(name);
         dataItemNew.setType(type);
         dataItemNew.setAuthority(authority);
+        if(authority==true){
+            dataItemNew.setStatus("Public");
+        }
         dataItemNew.setToken(token);
         dataItemNew.setCreateTime(now);
         dataItemNew.setWorkSpace(meta.getString("workSpace"));

@@ -7,15 +7,14 @@ import njgis.opengms.portal.AbstractTask.AsyncTask;
 import njgis.opengms.portal.bean.JsonResult;
 import njgis.opengms.portal.dao.ComputableModelDao;
 import njgis.opengms.portal.dao.DataItemDao;
+import njgis.opengms.portal.dao.DataItemNewDao;
+
 import njgis.opengms.portal.dao.TaskDao;
 import njgis.opengms.portal.dao.UserDao;
 import njgis.opengms.portal.dto.task.ResultDataDTO;
 import njgis.opengms.portal.dto.task.TestDataUploadDTO;
 import njgis.opengms.portal.dto.task.UploadDataDTO;
-import njgis.opengms.portal.entity.ComputableModel;
-import njgis.opengms.portal.entity.DataItem;
-import njgis.opengms.portal.entity.Task;
-import njgis.opengms.portal.entity.User;
+import njgis.opengms.portal.entity.*;
 import njgis.opengms.portal.entity.intergrate.Model;
 import njgis.opengms.portal.entity.support.ParamInfo;
 import njgis.opengms.portal.entity.support.TaskData;
@@ -68,6 +67,10 @@ public class TaskService {
 
     @Autowired
     DataItemDao dataItemDao;
+
+    @Autowired
+    DataItemNewDao dataItemNewDao;
+
 
     @Value("${managerServerIpAndPort}")
     private String managerServer;
@@ -707,11 +710,16 @@ public class TaskService {
     public List<UploadDataDTO> getTestDataUploadArrayDataItem(TestDataUploadDTO testDataUploadDTO, JSONObject mdlJson) throws Exception {
         JSONArray states = mdlJson.getJSONObject("mdl").getJSONArray("states");
         //根据dataItemId获取数据下载链接,并获取数据流
-        DataItem dataItem = dataItemDao.findFirstById(testDataUploadDTO.getDataItemId());
+//        DataItem dataItem = dataItemDao.findFirstById(testDataUploadDTO.getDataItemId());
+        DataItemNew dataItemNew = dataItemNewDao.findFirstById(testDataUploadDTO.getDataItemId());
+
+
         InputStream inputStream = null;
         FileOutputStream fileOutputStream = null;
-        if (dataItem.getDataUrl()!=null){
-            URL url = new URL(dataItem.getDataUrl());
+
+
+        if (dataItemNew.getDataUrl()!=null){
+            URL url = new URL(dataItemNew.getDataUrl());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(60000);

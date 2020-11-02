@@ -1333,7 +1333,9 @@ var  data_item_info= new Vue({
         },
         invokeProcessingVisual($event){
             this.processingType = "visual";
+            this.loading3 = true;
             this.loading2 = false;
+
             let processingInvokes = $(".processingInvokeVisual");
             for(i=0;i<processingInvokes.length;i++){
                 if(event.currentTarget===processingInvokes[i]){
@@ -1366,8 +1368,10 @@ var  data_item_info= new Vue({
             })
         },
         invokeProcessingNow(){
+
+
             //this.loading = true;
-            this.loading3 = true;
+            this.loading2 = true;
             this.objProcess.msg = 'reqPcs';//固定值，区分消息类型
             // var url = window.location.href;
             // var index = url.lastIndexOf("\/");
@@ -1445,6 +1449,7 @@ var  data_item_info= new Vue({
                     }
                     alert('service node offline')
                 } else
+
                 //注册门户到中转服务器成功
                 if (e.data === 'success') {
                     // alert("连接成功")
@@ -1456,10 +1461,42 @@ var  data_item_info= new Vue({
                     } else {
                     }
                     let r = JSON.parse(e.data)
-                    if (r.msg == 'insitudata') {
-                        // alert(e.data)
+                    if(r.msg=='pcsErr'){//处理方法出现错误
                         if (type=="process"){
                             that.loading2 = false; that.loading3 = false;
+                        }else {
+                            that.loading = false;
+                        }
+                        alert('Processing Error:\n'+r.stoutErr)
+
+                    }else
+                    if (r.msg == 'insitudata') {//处理成功，返回结果
+                        // alert(e.data)
+                        let data = {
+                            dataOid: that.dataItemId,
+                            rId: r.id,
+                            type:type
+                        }
+                        $.ajax({
+                            url:"/dataItem/saveUrl",
+                            type:"POST",
+                            data:data,
+                            success:(json)=>{
+
+
+                            }
+                        })
+                        if (type=="process"){
+
+
+
+                            that.$notify({
+                                message:"Processing method stdout:\n"+r.stout,
+                                type:'success',
+                                duration:0
+                            })
+                            that.loading2 = false;
+                            that.loading3 = false;
                         }else {
                             that.loading = false;
                         }
@@ -1469,9 +1506,7 @@ var  data_item_info= new Vue({
                         return
                     }
                 }
-                // if (objSend!=null&&e.data!="node offline") {
-                //     _ws.send(JSON.stringify(objSend));
-                // }
+
 
 
             }
